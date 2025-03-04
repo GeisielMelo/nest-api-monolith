@@ -2,22 +2,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
+import { join } from 'path'; 
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mongodb',
-        database: 'TmdbCatalogueDB',
-        url: configService.get<string>('MONGODB_URI'),
+      useFactory: () => ({
+        type: 'sqlite',
+        database: join(__dirname, 'database', 'db.sqlite'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        ssl: true,
-        authSource: 'admin',
       }),
       inject: [ConfigService],
     }),
