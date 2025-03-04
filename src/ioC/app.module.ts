@@ -1,9 +1,8 @@
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { User } from 'src/modules/users/domain/models/users.model';
+import { User } from 'src/modules/users/domain/models/users.model'
 import { UsersModule } from '../modules/users/users.module'
 import { ConfigModule, ConfigType } from '@nestjs/config'
-import databaseConfig from '../config/database.config';
-import { AppController } from './app.controller'
+import databaseConfig from '../config/database.config'
 import { Module } from '@nestjs/common'
 
 @Module({
@@ -25,6 +24,5 @@ import { Module } from '@nestjs/common'
       inject: [databaseConfig.KEY],
     }),
   ],
-  controllers: [AppController],
 })
 export class AppModule {}
