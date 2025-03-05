@@ -6,7 +6,7 @@ export class UsersTypeORMRepository implements UsersRepository {
   constructor(private readonly userRepository: Repository<User>) {}
 
   async create(user: User): Promise<User> {
-    return this.userRepository.save(user)
+    return this.userRepository.save({ ...user, created_at: new Date(), updated_at: new Date() })
   }
 
   async findById(id: string): Promise<User | undefined> {
@@ -22,7 +22,7 @@ export class UsersTypeORMRepository implements UsersRepository {
   }
 
   async update(id: string, user: User): Promise<User> {
-    await this.userRepository.update(id, user)
+    await this.userRepository.update(id, { ...user, updated_at: new Date() })
     return user
   }
 

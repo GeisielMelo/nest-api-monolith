@@ -3,13 +3,15 @@ import { User } from '../../entities/users.entity'
 
 interface UserWithId extends User {
   id?: string
+  created_at?: Date
+  updated_at?: Date
 }
 
 export class UsersInMemoryRepository implements UsersRepository {
   private users: UserWithId[] = []
 
   async create(user: User): Promise<User> {
-    this.users.push(user)
+    this.users.push({ ...user, created_at: new Date(), updated_at: new Date() })
     return user
   }
 
@@ -27,7 +29,7 @@ export class UsersInMemoryRepository implements UsersRepository {
 
   async update(id: string, user: User): Promise<User> {
     const userIndex = this.users.findIndex((user) => user.id === id)
-    this.users[userIndex] = user
+    this.users[userIndex] = { ...user, updated_at: new Date() }
     return user
   }
 
