@@ -1,12 +1,17 @@
 import { UsersRepository } from '../user.repository.interface'
-import { User } from '../../models/users.model'
+import { BadRequestException } from '@nestjs/common'
+import { User } from '../../models/user.model'
 import { Repository } from 'typeorm'
+import * as bcrypt from 'bcrypt'
 
 export class UsersTypeORMRepository implements UsersRepository {
   constructor(private readonly userRepository: Repository<User>) {}
 
   async create(user: User): Promise<User> {
-    return this.userRepository.save({ ...user, created_at: new Date(), updated_at: new Date() })
+    user.password = await bcrypt.hash(user.password, 10)
+    user.created_at = new Date()
+    user.updated_at = new Date()
+    return this.userRepository.save(user)
   }
 
   async findById(id: string): Promise<User | undefined> {
@@ -22,11 +27,16 @@ export class UsersTypeORMRepository implements UsersRepository {
   }
 
   async update(id: string, user: User): Promise<User> {
+    const existingUser = await this.userRepository.findOneByOrFail({ id: +id })
+    const isPasswordValid = await bcrypt.compare(user.password, existingUser.password)
+    if (!isPasswordValid) throw new BadRequestException('Invalid password.')
+
+    user.password = await bcrypt.hash(user.password, 10)
     await this.userRepository.update(id, { ...user, updated_at: new Date() })
-    return user
+    return { ...existingUser, ...user }
   }
 
-  async delete(id: string): Promise<void> {
+  async remove(id: string): Promise<void> {
     await this.userRepository.delete(id)
   }
 }

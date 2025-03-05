@@ -1,6 +1,8 @@
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { User } from 'src/modules/users/domain/models/users.model'
+import { User } from '../modules/users/domain/models/user.model'
+import { Like } from '../modules/likes/domain/models/like.model'
 import { UsersModule } from '../modules/users/users.module'
+import { LikesModule } from '../modules/likes/likes.module'
 import { ConfigModule, ConfigType } from '@nestjs/config'
 import databaseConfig from '../config/database.config'
 import { Module } from '@nestjs/common'
@@ -8,6 +10,7 @@ import { Module } from '@nestjs/common'
 @Module({
   imports: [
     UsersModule,
+    LikesModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [databaseConfig] })],
@@ -18,7 +21,7 @@ import { Module } from '@nestjs/common'
         username: configDatabase.username,
         password: configDatabase.password,
         database: configDatabase.database,
-        entities: [User],
+        entities: [User, Like],
         synchronize: true,
       }),
       inject: [databaseConfig.KEY],

@@ -1,6 +1,6 @@
-import { CreateUserDto } from '../http/dtos/create-users.dto'
-import { UpdateUserDto } from '../http/dtos/update-users.dto'
 import { USERS_REPOSITORY_TOKEN, UsersRepository } from './repositories/user.repository.interface'
+import { CreateUserDto } from '../http/dtos/create-user.dto'
+import { UpdateUserDto } from '../http/dtos/update-user.dto'
 import { Inject, Injectable } from '@nestjs/common'
 
 @Injectable()
@@ -30,7 +30,7 @@ export class UsersService {
     return await this.userRepository.update(id, userDto)
   }
 
-  async delete(id: string) {
-    return await this.userRepository.delete(id)
+  async remove(id: string) {
+    return await this.userRepository.remove(id)
   }
 }

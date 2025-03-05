@@ -5,7 +5,7 @@ import { USERS_REPOSITORY_TOKEN } from './user.repository.interface'
 import { Injectable, Provider } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
-import { User } from '../models/users.model'
+import { User } from '../models/user.model'
 import { Repository } from 'typeorm'
 
 export function provideUsersRepository(): Provider[] {

@@ -1,9 +1,9 @@
-import { User } from '../entities/users.entity'
+import { User } from '../entities/user.entity'
 
 export interface UsersRepository {
   create(user: User): Promise<User>
   update(id: string, user: Partial<User>): Promise<User>
-  delete(id: string): Promise<void>
+  remove(id: string): Promise<void>
   findByEmail(email: string): Promise<User | null>
   findById(id: string): Promise<User | null>
   findAll(): Promise<User[]>

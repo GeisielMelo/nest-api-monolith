@@ -1,5 +1,7 @@
 import { UsersRepository } from '../user.repository.interface'
-import { User } from '../../entities/users.entity'
+import { User } from '../../entities/user.entity'
+import { randomUUID } from 'crypto'
+import * as bcrypt from 'bcrypt'
 
 interface UserWithId extends User {
   id?: string
@@ -11,8 +13,10 @@ export class UsersInMemoryRepository implements UsersRepository {
   private users: UserWithId[] = []
 
   async create(user: User): Promise<User> {
-    this.users.push({ ...user, created_at: new Date(), updated_at: new Date() })
-    return user
+    const hash = await bcrypt.hash(user.password, 10)
+    const newUser = { ...user, id: randomUUID(), password: hash, created_at: new Date(), updated_at: new Date() }
+    this.users.push(newUser)
+    return newUser
   }
 
   async findById(id: string): Promise<User | null> {
@@ -33,7 +37,7 @@ export class UsersInMemoryRepository implements UsersRepository {
     return user
   }
 
-  async delete(id: string): Promise<void> {
+  async remove(id: string): Promise<void> {
     this.users = this.users.filter((user) => user.id !== id)
   }
 }

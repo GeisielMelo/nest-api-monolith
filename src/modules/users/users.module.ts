@@ -1,22 +1,13 @@
 import { provideUsersRepository } from './domain/repositories/user.repository.provider'
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
-import { UsersController } from './http/user.controller'
+import { UsersController } from './http/users.controller'
 import { UsersService } from './domain/users.service'
-import { UserResolver } from './http/user.resolver'
-import { User } from './domain/models/users.model'
+import { User } from './domain/models/user.model'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { GraphQLModule } from '@nestjs/graphql'
 import { Module } from '@nestjs/common'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: true,
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
-  providers: [UsersService, ...provideUsersRepository(), UserResolver],
+  providers: [UsersService, ...provideUsersRepository()],
 })
 export class UsersModule {}
