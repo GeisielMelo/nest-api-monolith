@@ -15,11 +15,11 @@ export class UsersTypeORMRepository implements UsersRepository {
   }
 
   async findById(id: string): Promise<User | undefined> {
-    return this.userRepository.findOneByOrFail({ id: +id })
+    return this.userRepository.findOneBy({ id: +id })
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOneByOrFail({ email })
+    return this.userRepository.findOneBy({ email })
   }
 
   async findAll(): Promise<User[]> {
@@ -27,7 +27,7 @@ export class UsersTypeORMRepository implements UsersRepository {
   }
 
   async update(id: string, user: User): Promise<User> {
-    const existingUser = await this.userRepository.findOneByOrFail({ id: +id })
+    const existingUser = await this.userRepository.findOneBy({ id: +id })
     const isPasswordValid = await bcrypt.compare(user.password, existingUser.password)
     if (!isPasswordValid) throw new BadRequestException('Invalid password.')
 
