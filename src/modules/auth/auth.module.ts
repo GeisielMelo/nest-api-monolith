@@ -2,11 +2,12 @@ import { provideAuthRepository } from './domain/repositories/auth.repository.pro
 import { User } from '../users/domain/models/user.model'
 import { AuthController } from './http/auth.controller'
 import { AuthService } from './domain/auth.service'
+import { Token } from './domain/models/token.model'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Module } from '@nestjs/common'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, Token])],
   controllers: [AuthController],
   providers: [AuthService, ...provideAuthRepository()],
 })
