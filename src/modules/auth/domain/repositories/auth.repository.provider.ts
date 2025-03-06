@@ -8,6 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { Repository } from 'typeorm'
 
+import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { Token } from '../models/token.model'
+
 export function provideAuthRepository(): Provider[] {
   return [
     {
@@ -23,7 +27,12 @@ async function provideAuthRepositoryFactory(dependenciesProvider: AuthRepoDepend
   await ConfigModule.envVariablesLoaded
   switch (process.env.DATABASE_SOURCE) {
     case DataSource.MYSQL:
-      return new AuthTypeORMRepository(dependenciesProvider.typeOrmRepository)
+      return new AuthTypeORMRepository(
+        dependenciesProvider.typeOrmRepository,
+        dependenciesProvider.tokenRepository,
+        dependenciesProvider.jwtService,
+        dependenciesProvider.configService,
+      )
     case DataSource.MEMORY:
       return new AuthInMemoryRepository()
     default:
@@ -36,5 +45,9 @@ export class AuthRepoDependenciesProvider {
   constructor(
     @InjectRepository(User)
     public typeOrmRepository: Repository<User>,
+    @InjectRepository(Token)
+    public tokenRepository: Repository<Token>,
+    public jwtService: JwtService,
+    public configService: ConfigService,
   ) {}
 }

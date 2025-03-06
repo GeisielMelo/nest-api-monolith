@@ -54,13 +54,14 @@ export class AuthTypeORMRepository implements AuthRepository {
       await this.storeRefreshToken(id, refreshToken)
       return { access: accessToken, refresh: refreshToken }
     } catch (error) {
-      if (error) throw new InternalServerErrorException('Error generating tokens')
+      throw new InternalServerErrorException('Error generating tokens')
     }
   }
 
   async storeRefreshToken(id: number, token: string) {
     try {
-      const newToken = this.tokenRepository.create({ user_id: id, token })
+      const data = { user_id: id, type: 'refresh', token, created_at: new Date(), updated_at: new Date() }
+      const newToken = this.tokenRepository.create(data)
       await this.tokenRepository.save(newToken)
     } catch (error) {
       if (error) throw new InternalServerErrorException('Error generating tokens')

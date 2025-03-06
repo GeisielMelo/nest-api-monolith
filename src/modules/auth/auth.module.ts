@@ -4,11 +4,12 @@ import { AuthController } from './http/auth.controller'
 import { AuthService } from './domain/auth.service'
 import { Token } from './domain/models/token.model'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { JwtService } from '@nestjs/jwt'
 import { Module } from '@nestjs/common'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Token])],
   controllers: [AuthController],
-  providers: [AuthService, ...provideAuthRepository()],
+  providers: [AuthService, JwtService, ...provideAuthRepository()],
 })
 export class AuthModule {}
