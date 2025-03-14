@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common'
+import { AuthGuard } from '../../../common/guards/auth.guard'
+import { UpdateLikeDto } from './dtos/update-like.dto'
 import { LikesService } from '../domain/likes.service'
 import { CreateLikeDto } from './dtos/create-like.dto'
 import { Like } from '../domain/entities/like.entity'
-import { UpdateLikeDto } from './dtos/update-like.dto'
-import { AuthGuard } from 'src/common/guards/auth.guard'
 
 @UseGuards(AuthGuard)
 @Controller('likes')
