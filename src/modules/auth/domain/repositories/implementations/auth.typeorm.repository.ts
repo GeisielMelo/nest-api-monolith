@@ -27,17 +27,17 @@ export class AuthTypeORMRepository implements AuthRepository {
 
   async signIn(signInDto: SignInDto, res: Response) {
     const user = await this.userRepository.findOneBy({ email: signInDto.email })
-    if (!user) throw new BadRequestException('Invalid email')
+    if (!user) throw new BadRequestException('This user does not exist.')
 
     const isPasswordValid = await bcrypt.compare(signInDto.password, user.password)
-    if (!isPasswordValid) throw new BadRequestException('Invalid password')
+    if (!isPasswordValid) throw new BadRequestException('Invalid email or password.')
 
     return this.generateUserTokens(user, res)
   }
 
   async signUp(signUpDto: SignUpDto, res: Response) {
     const user = await this.userRepository.findOneBy({ email: signUpDto.email })
-    if (user) throw new BadRequestException('User already exists')
+    if (user) throw new BadRequestException('User already exists.')
 
     const hashedPassword = await bcrypt.hash(signUpDto.password, 10)
     const data = { ...signUpDto, password: hashedPassword, created_at: new Date(), updated_at: new Date() }
@@ -47,7 +47,7 @@ export class AuthTypeORMRepository implements AuthRepository {
     return this.generateUserTokens(newUser, res)
   }
 
-  async generateUserTokens(user: User, res: Response) {
+  private async generateUserTokens(user: User, res: Response) {
     try {
       const { id, email } = user
       const accessToken = this.jwtService.sign({ id, email }, { secret: this.JWT_ACCESS_SECRET, expiresIn: '12h' })
@@ -63,7 +63,7 @@ export class AuthTypeORMRepository implements AuthRepository {
     }
   }
 
-  async storeRefreshToken(id: number, token: string) {
+  private async storeRefreshToken(id: number, token: string) {
     try {
       const data = { user_id: id, type: 'refresh', token, created_at: new Date(), updated_at: new Date() }
       const newToken = this.tokenRepository.create(data)

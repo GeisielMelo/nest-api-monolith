@@ -5,12 +5,12 @@ import { AUTH_REPOSITORY_TOKEN } from './auth.repository.interface'
 import { User } from 'src/modules/users/domain/models/user.model'
 import { Injectable, Provider } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { ConfigService } from '@nestjs/config'
 import { ConfigModule } from '@nestjs/config'
+import { Token } from '../models/token.model'
+import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
 
-import { JwtService } from '@nestjs/jwt'
-import { ConfigService } from '@nestjs/config'
-import { Token } from '../models/token.model'
 
 export function provideAuthRepository(): Provider[] {
   return [
@@ -34,9 +34,9 @@ async function provideAuthRepositoryFactory(dependenciesProvider: AuthRepoDepend
         dependenciesProvider.configService,
       )
     case DataSource.MEMORY:
-      return new AuthInMemoryRepository()
+      return new AuthInMemoryRepository(dependenciesProvider.configService)
     default:
-      return new AuthInMemoryRepository()
+      return new AuthInMemoryRepository(dependenciesProvider.configService)
   }
 }
 
