@@ -1,4 +1,4 @@
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, InternalServerErrorException } from '@nestjs/common'
 import { cookiesConfig } from '../../../../../config/cookies.config'
 import { User } from '../../../../users/domain/models/user.model'
 import { AuthRepository } from '../auth.repository.interface'
@@ -8,7 +8,6 @@ import { Token } from '../../models/token.model'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
-import { Response } from 'express'
 import * as bcrypt from 'bcrypt'
 
 export class AuthTypeORMRepository implements AuthRepository {
@@ -25,17 +24,17 @@ export class AuthTypeORMRepository implements AuthRepository {
     this.JWT_REFRESH_SECRET = this.configService.get<string>('jwt.refresh')
   }
 
-  async signIn(signInDto: SignInDto, res: Response) {
+  public async signIn(signInDto: SignInDto) {
     const user = await this.userRepository.findOneBy({ email: signInDto.email })
     if (!user) throw new BadRequestException('This user does not exist.')
 
     const isPasswordValid = await bcrypt.compare(signInDto.password, user.password)
     if (!isPasswordValid) throw new BadRequestException('Invalid email or password.')
 
-    return this.generateUserTokens(user, res)
+    return this.generateUserTokens(user)
   }
 
-  async signUp(signUpDto: SignUpDto, res: Response) {
+  public async signUp(signUpDto: SignUpDto) {
     const user = await this.userRepository.findOneBy({ email: signUpDto.email })
     if (user) throw new BadRequestException('User already exists.')
 
@@ -44,23 +43,26 @@ export class AuthTypeORMRepository implements AuthRepository {
     const newUser = this.userRepository.create(data)
     await this.userRepository.save(newUser)
 
-    return this.generateUserTokens(newUser, res)
+    return this.generateUserTokens(newUser)
   }
 
-  private async generateUserTokens(user: User, res: Response) {
+  public async refresh(refreshToken: string) {
     try {
-      const { id, email } = user
+      const decoded = this.jwtService.verify(refreshToken, { secret: this.JWT_REFRESH_SECRET })
+      const { id, email } = decoded
       const accessToken = this.jwtService.sign({ id, email }, { secret: this.JWT_ACCESS_SECRET, expiresIn: '12h' })
-      const refreshToken = this.jwtService.sign({ id, email }, { secret: this.JWT_REFRESH_SECRET, expiresIn: '7 days' })
-
-      await this.storeRefreshToken(id, refreshToken)
-
-      res.cookie('access', accessToken, cookiesConfig.access)
-      res.cookie('refresh', refreshToken, cookiesConfig.refresh)
-      return res.send({ message: 'OK' })
+      return { access: accessToken }
     } catch (error) {
-      throw new InternalServerErrorException('Error generating tokens')
+      throw new ForbiddenException('Invalid authorization token.')
     }
+  }
+
+  private async generateUserTokens(user: User) {
+    const { id, email } = user
+    const accessToken = this.jwtService.sign({ id, email }, { secret: this.JWT_ACCESS_SECRET, expiresIn: '12h' })
+    const refreshToken = this.jwtService.sign({ id, email }, { secret: this.JWT_REFRESH_SECRET, expiresIn: '7 days' })
+    await this.storeRefreshToken(id, refreshToken)
+    return { access: accessToken, refresh: refreshToken }
   }
 
   private async storeRefreshToken(id: number, token: string) {

@@ -1,8 +1,8 @@
 import { AUTH_REPOSITORY_TOKEN, AuthRepository } from './repositories/auth.repository.interface'
+import { RefreshTokenDto } from '../http/dtos/refresh-token.dto'
 import { SignUpDto } from '../http/dtos/sign-up.dto'
 import { SignInDto } from '../http/dtos/sign-in.dto'
 import { Inject, Injectable } from '@nestjs/common'
-import { Response } from 'express'
 
 @Injectable()
 export class AuthService {
@@ -11,11 +11,15 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
   ) {}
 
-  async signIn(signInDto: SignInDto, res: Response) {
-    return await this.authRepository.signIn(signInDto, res)
+  async signIn(signInDto: SignInDto) {
+    return await this.authRepository.signIn(signInDto)
   }
 
-  async signUp(signUpDto: SignUpDto, res: Response) {
-    return await this.authRepository.signUp(signUpDto, res)
+  async signUp(signUpDto: SignUpDto) {
+    return await this.authRepository.signUp(signUpDto)
+  }
+
+  async refresh(refreshTokenDto: RefreshTokenDto) {
+    return await this.authRepository.refresh(refreshTokenDto.refreshToken)
   }
 }
