@@ -8,6 +8,7 @@ import { Token } from '../../models/token.model'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
+import { Response } from 'express'
 import * as bcrypt from 'bcrypt'
 
 export class AuthTypeORMRepository implements AuthRepository {
@@ -24,17 +25,16 @@ export class AuthTypeORMRepository implements AuthRepository {
     this.JWT_REFRESH_SECRET = this.configService.get<string>('jwt.refresh')
   }
 
-  public async signIn(signInDto: SignInDto) {
+  public async signIn(signInDto: SignInDto, response: Response) {
     const user = await this.userRepository.findOneBy({ email: signInDto.email })
     if (!user) throw new BadRequestException('This user does not exist.')
 
     const isPasswordValid = await bcrypt.compare(signInDto.password, user.password)
     if (!isPasswordValid) throw new BadRequestException('Invalid email or password.')
-
-    return this.generateUserTokens(user)
+    return this.generateUserTokens(user, response)
   }
 
-  public async signUp(signUpDto: SignUpDto) {
+  public async signUp(signUpDto: SignUpDto, response: Response) {
     const user = await this.userRepository.findOneBy({ email: signUpDto.email })
     if (user) throw new BadRequestException('User already exists.')
 
@@ -42,8 +42,7 @@ export class AuthTypeORMRepository implements AuthRepository {
     const data = { ...signUpDto, password: hashedPassword, created_at: new Date(), updated_at: new Date() }
     const newUser = this.userRepository.create(data)
     await this.userRepository.save(newUser)
-
-    return this.generateUserTokens(newUser)
+    return this.generateUserTokens(newUser, response)
   }
 
   public async refresh(refreshToken: string) {
@@ -57,12 +56,15 @@ export class AuthTypeORMRepository implements AuthRepository {
     }
   }
 
-  private async generateUserTokens(user: User) {
+  private async generateUserTokens(user: User, response: Response) {
     const { id, email } = user
-    const accessToken = this.jwtService.sign({ id, email }, { secret: this.JWT_ACCESS_SECRET, expiresIn: '12h' })
-    const refreshToken = this.jwtService.sign({ id, email }, { secret: this.JWT_REFRESH_SECRET, expiresIn: '7 days' })
+    const accessToken = this.jwtService.sign({ id, email }, { secret: this.JWT_ACCESS_SECRET, expiresIn: '15m' })
+    const refreshToken = this.jwtService.sign({ id, email }, { secret: this.JWT_REFRESH_SECRET, expiresIn: '7d' })
     await this.storeRefreshToken(id, refreshToken)
-    return { access: accessToken, refresh: refreshToken }
+
+    response.cookie('access', accessToken, cookiesConfig.access)
+    response.cookie('refresh', refreshToken, cookiesConfig.refresh)
+    return response.send({ message: 'OK' })
   }
 
   private async storeRefreshToken(id: number, token: string) {

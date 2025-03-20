@@ -3,8 +3,8 @@ import { SignUp } from '../entities/sign-up.entity'
 import { Response } from 'express'
 
 export interface AuthRepository {
-  signIn(signIn: SignIn): Promise<{ access: string; refresh: string }>
-  signUp(signUp: SignUp): Promise<{ access: string; refresh: string }>
+  signIn(signIn: SignIn, response: Response): Promise<Response>
+  signUp(signUp: SignUp, response: Response): Promise<Response>
   refresh(refreshToken: string): Promise<{ access: string }>
 }
 
