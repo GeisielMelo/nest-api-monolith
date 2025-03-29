@@ -1,3 +1,4 @@
+import { cookiesConfig } from '../../../../../config/cookies.config'
 import { User } from '../../../../users/domain/entities/user.entity'
 import { AuthRepository } from '../auth.repository.interface'
 import { SignIn } from '../../entities/sign-in.entity'
@@ -9,7 +10,6 @@ import { JwtService } from '@nestjs/jwt'
 import { randomUUID } from 'crypto'
 import { Response } from 'express'
 import * as bcrypt from 'bcrypt'
-import { cookiesConfig } from 'src/config/cookies.config'
 
 interface ExtendedUser extends User {
   id: string
