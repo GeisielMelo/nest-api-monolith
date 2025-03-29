@@ -21,4 +21,18 @@ export class TMDBService {
     const response = await firstValueFrom(this.httpService.get(url, { params }))
     return response.data
   }
+
+  async trending(query) {
+    const url = `${this.API_URL}/trending/all/day`
+    const params = { ...query, api_key: this.TMDB_API_KEY }
+    const response = await firstValueFrom(this.httpService.get(url, { params }))
+    return response.data
+  }
+
+  async theatres(query) {
+    const url = `${this.API_URL}/movie/now_playing`
+    const params = { ...query, api_key: this.TMDB_API_KEY }
+    const response = await firstValueFrom(this.httpService.get(url, { params }))
+    return response.data
+  }
 }

@@ -14,4 +14,14 @@ export class TMDBController {
   discoverTV(@Query() query) {
     return this.tmdbService.discover('tv', query)
   }
+
+  @Get('/movie/now_playing')
+  theatres(@Query() query) {
+    return this.tmdbService.theatres(query)
+  }
+
+  @Get('/trending/all/day')
+  trending(@Query() query) {
+    return this.tmdbService.trending(query)
+  }
 }
