@@ -6,9 +6,7 @@ import { UsersModule } from '../modules/users/users.module'
 import { LikesModule } from '../modules/likes/likes.module'
 import { ConfigModule, ConfigType } from '@nestjs/config'
 import { AuthModule } from '../modules/auth/auth.module'
-import { TMDBModule } from '../modules/tmdb/tmdb.module'
 import databaseConfig from '../config/database.config'
-import tmdbConfig from '../config/tmdb.config'
 import jwtConfig from '../config/jwt.config'
 import { Module } from '@nestjs/common'
 
@@ -17,8 +15,7 @@ import { Module } from '@nestjs/common'
     UsersModule,
     LikesModule,
     AuthModule,
-    TMDBModule,
-    ConfigModule.forRoot({ load: [jwtConfig, tmdbConfig], isGlobal: true }),
+    ConfigModule.forRoot({ load: [jwtConfig], isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [databaseConfig] })],
       useFactory: (configDatabase: ConfigType<typeof databaseConfig>): TypeOrmModuleOptions => ({
