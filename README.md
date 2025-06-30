@@ -81,4 +81,4 @@ The API will be available at `http://localhost:3000/api/v1`.
 
 ## License
 
-MIT
+- [MIT](https://choosealicense.com/licenses/mit/)
