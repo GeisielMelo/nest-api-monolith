@@ -1,4 +1,4 @@
-# NEST API EXAMPLE
+# Nest Api Monolith
 
 A robust, modular backend API built with [NestJS](https://nestjs.com/) for managing users, authentication, and likes. Designed for scalability, security, and easy integration with frontend clients.
 
